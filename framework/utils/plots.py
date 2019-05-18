@@ -1,19 +1,24 @@
 # -*- coding: utf-8 -*-
+import math
+import re
+
+from PIL import Image, ImageFont, ImageDraw  # images
+from imageio import get_writer as imageio_get_writer, imread as imageio_imread  # GIFs
+from matplotlib import rc as matplotlib_rc # for regulating font
 from matplotlib import use as matplotlib_use
-matplotlib_use('Agg',force=True) # no display
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
-from seaborn import heatmap as seaborn_heatmap # Heatmap
-from imageio import get_writer as imageio_get_writer, imread as imageio_imread # GIFs
-from PIL import Image, ImageFont, ImageDraw # images
+from scipy.interpolate import interp1d
+from seaborn import heatmap as seaborn_heatmap  # Heatmap
 
-import math
-# import datetime
-import re
 import numpy as np
-
 import options
+
+matplotlib_use('Agg',force=True) # no display
+font_dict = {'size':22}
+matplotlib_rc('font', **font_dict)
+
 flags = options.get() # get command line args
 
 def plot(logs, figure_file):
@@ -37,7 +42,7 @@ def plot(logs, figure_file):
 		print("Not enough data for a reasonable plot")
 		return
 	# Create new figure and two subplots, sharing both axes
-	ncols=2 if max_stats_count >= 2 else max_stats_count
+	ncols=3 if max_stats_count >= 3 else max_stats_count
 	nrows=math.ceil(max_stats_count/ncols)
 	# First set up the figure and the axis
 	# fig, ax = matplotlib.pyplot.subplots(nrows=1, ncols=1, sharey=False, sharex=False, figsize=(10,10)) # this method causes memory leaks
@@ -65,18 +70,15 @@ def plot(logs, figure_file):
 		y = {}
 		stat = stats[log_id]
 		for key in stat: # foreach statistic
-			y[key] = {"min":float("+inf"), "max":float("-inf"), "data":[]}
+			y[key] = {"min":float("+inf"), "max":float("-inf"), "data":[], "std":[]}
 			x[key] = []
 		last_step = 0
 		for _ in range(plot_size):
-			value_sum = {}
+			values = {}
 			# initialize
 			for key in stat: # foreach statistic
-				value_sum[key] = 0
-			# compute value_sum foreach key
-			good_obj_count = {}
-			for key in stat:
-				good_obj_count[key] = 0
+				values[key] = []
+			# compute values foreach key
 			plotpoint_i = 0
 			for (step, obj) in data:
 				plotpoint_i += 1
@@ -86,9 +88,8 @@ def plot(logs, figure_file):
 				for key in stat: # foreach statistic
 					if key not in obj:
 						continue
-					good_obj_count[key] += 1
 					v = obj[key]
-					value_sum[key] += v
+					values[key].append(v)
 					if v > y[key]["max"]:
 						y[key]["max"] = v
 					if v < y[key]["min"]:
@@ -97,18 +98,10 @@ def plot(logs, figure_file):
 					break
 			# add average to data for plotting
 			for key in stat: # foreach statistic
-				if good_obj_count[key] > 0:
-					if logs[log_id]["name"] == 'replay_ratio=0':
-						v = step/(128*(2**6))
-					elif logs[log_id]["name"] == 'replay_ratio=1':
-						v = (step/(128*(2**6)))*2
-					elif logs[log_id]["name"] == 'replay_ratio=2':
-						v = (step/(128*(2**6)))*3
-					else:
-						v = (step/(128*(2**6)))*1.5
-					if v <= 65000:
-						y[key]["data"].append(value_sum[key]/good_obj_count[key])
-						x[key].append(v)
+				if len(values[key]) > 0:
+					y[key]["data"].append(np.mean(values[key]))
+					y[key]["std"].append(np.std(values[key]))
+					x[key].append(last_step)
 		# Populate axes
 		print(name)
 		for j in range(ncols):
@@ -119,14 +112,32 @@ def plot(logs, figure_file):
 				key = stat[idx]
 				ax_id = key_ids[key]
 				ax = axes[ax_id]
+				y_key = y[key]
+				x_key = x[key]
 				# print stats
-				print("    ", y[key]["min"], " < ", key, " < ", y[key]["max"])
+				print("    ", y_key["min"], " < ", key, " < ", y_key["max"])
 				# ax
-				ax.set_ylabel(key)
-				ax.set_xlabel('parameters updates')
+				ax.set_ylabel(key, fontdict=font_dict)
+				ax.set_xlabel('step', fontdict=font_dict)
 				# ax.plot(x, y, linewidth=linewidth, markersize=markersize)
-				ax.plot(x[key], y[key]["data"], label=name)
+				y_key_mean = np.array(y_key["data"])
+				y_key_std = np.array(y_key["std"])
+				#===============================================================
+				# # build interpolators
+				# mean_interpolator = interp1d(x_key, y_key_mean, kind='linear')
+				# min_interpolator = interp1d(x_key, y_key_mean-y_key_std, kind='linear')
+				# max_interpolator = interp1d(x_key, y_key_mean+y_key_std, kind='linear')
+				# xnew = np.linspace(x_key[0], x_key[-1], num=plot_size, endpoint=True)
+				# # plot mean line
+				# ax.plot(xnew, mean_interpolator(xnew), label=name)
+				#===============================================================
+				# plot mean line
+				ax.plot(x_key, y_key_mean, label=name)
+				# plot std range
+				ax.fill_between(x_key, y_key_mean-y_key_std, y_key_mean+y_key_std, alpha=0.25)
+				# show legend
 				ax.legend()
+				# display grid
 				ax.grid(True)
 	figure.savefig(figure_file,bbox_inches='tight')
 	print("Plot figure saved in ", figure_file)
@@ -171,14 +182,7 @@ def parse_line(line,i=0):
 		x = re.sub('[\',\[\]]', '', x) # remove following chars: ',[]
 		# print(x)
 		key, val = x.split('=')
-		if key.startswith('extrinsic_') or key.startswith('intrinsic_'):
-			obj[key] = float(val)
-		#elif key == 'train0_loss_actor':
-		#	key = 'loss_actor'
-		#	obj[key] = float(val)
-		#elif key == 'train0_loss_critic':
-		#	key = 'loss_critic'
-		#	obj[key] = float(val)
+		obj[key] = float(val)
 	# print (obj)
 	return (step, obj)
 	
@@ -221,7 +225,7 @@ def combine_images(images_list, file_name):
 	imgs = [ Image.open(i) for i in images_list ]
 	# pick the smallest image, and resize the others to match it (can be arbitrary image shape here)
 	min_shape = sorted( [(np.sum(i.size), i.size ) for i in imgs])[0][1]
-	imgs_comb = np.hstack( (np.asarray( i.resize(min_shape) ) for i in imgs ) )
+	imgs_comb = np.hstack( [np.asarray( i.resize(min_shape) ) for i in imgs] )
 	# save the picture
 	imgs_comb = Image.fromarray( imgs_comb )
 	imgs_comb.save( file_name )
