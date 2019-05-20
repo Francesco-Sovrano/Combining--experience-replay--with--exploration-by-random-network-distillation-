@@ -19,7 +19,7 @@ fi
 pip install pip==9.0.3 # pip 10.0.1 has issues with pybind11 -> required by fastText
 # install common libraries
 pip install cython psutil numba
-pip install tensorflow # tensorflow includes numpy
+pip install tensorflow==1.13.1 # tensorflow includes numpy
 pip install scipy sklearn
 pip install matplotlib seaborn imageio
 pip install sortedcontainers opencv-python

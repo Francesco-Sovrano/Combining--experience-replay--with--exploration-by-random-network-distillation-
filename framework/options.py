@@ -108,7 +108,7 @@ def build():
 	tf.app.flags.DEFINE_boolean("monitor_memory_usage", False, "Whether to monitor memory usage")
 # Plot
 	tf.app.flags.DEFINE_boolean("compute_plot_when_saving", True, "Whether to compute the plot when saving checkpoints")
-	tf.app.flags.DEFINE_integer("max_plot_size", 1000, "Maximum number of points in the plot. The smaller it is, the less RAM is required. If the log file has more than max_plot_size points, then max_plot_size means of slices are used instead.")
+	tf.app.flags.DEFINE_integer("max_plot_size", 25, "Maximum number of points in the plot. The smaller it is, the less RAM is required. If the log file has more than max_plot_size points, then max_plot_size means of slices are used instead.")
 	
 	global options_built
 	options_built = True
