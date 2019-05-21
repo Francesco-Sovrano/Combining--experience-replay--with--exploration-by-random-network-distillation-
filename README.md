@@ -1,4 +1,4 @@
-Combining Experience Replay with Exploration by Random Network Distillation
+[Combining Experience Replay with Exploration by Random Network Distillation](https://arxiv.org/abs/1905.07579)
 ==========
 
 Our work is a simple extension of the paper [Exploration by Random Network Distillation](https://arxiv.org/abs/1810.12894). More in detail, we show how to efficiently combine Intrinsic Rewards with Experience Replay in order to achieve more efficient and robust exploration (with respect to PPO/RND) and consequently better results in terms of agent performances and sample efficiency. We are able to do it by using a new technique named Prioritized Oversampled Experience Replay (POER), that has been built upon the definition of what is the important experience useful to replay. Finally, we evaluate our technique on the famous Atari game Montezuma’s Revenge and some other hard exploration Atari games.
@@ -29,7 +29,7 @@ If you need to edit the experiment settings, feel free to edit the file [framewo
 Experiments
 -------
 
-Here, the results of some of our experiments in the form of a comparison of our algorithm (PPO/RND/POER) against PPO/RND and PPO/POER. For deeper details about the performed experiments and the evaluation of their results, please read [Combining Experience Replay with Exploration by Random Network Distillation]().
+Here, the results of some of our experiments in the form of a comparison of our algorithm (PPO/RND/POER) against PPO/RND and PPO/POER. For deeper details about the performed experiments and the evaluation of their results, please read [Combining Experience Replay with Exploration by Random Network Distillation](https://arxiv.org/abs/1905.07579).
 ![PPO/RND/POER vs PPO/RND vs PPO/POER in: Montezuma's Revenge, Solaris, Venture](images/all.png)
 
 Contact
