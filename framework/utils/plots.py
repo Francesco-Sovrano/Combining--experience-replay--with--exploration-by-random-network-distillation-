@@ -6,6 +6,7 @@ from PIL import Image, ImageFont, ImageDraw  # images
 from imageio import get_writer as imageio_get_writer, imread as imageio_imread  # GIFs
 from matplotlib import rc as matplotlib_rc # for regulating font
 from matplotlib import use as matplotlib_use
+matplotlib_use('Agg',force=True) # no display
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
@@ -15,7 +16,6 @@ from seaborn import heatmap as seaborn_heatmap  # Heatmap
 import numpy as np
 import options
 
-matplotlib_use('Agg',force=True) # no display
 font_dict = {'size':22}
 matplotlib_rc('font', **font_dict)
 
