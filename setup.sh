@@ -22,6 +22,6 @@ pip install psutil
 pip install tensorflow==1.13.1 # tensorflow includes numpy
 pip install scipy sklearn
 pip install matplotlib seaborn imageio
-pip install sortedcontainers
+pip install sortedcontainers opencv-python
 # install gym
 pip install gym[atari]
