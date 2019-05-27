@@ -61,10 +61,6 @@ class Base_Network(Network):
 			input, internal_state_tuple = self._rnn_layer(input=input, scope=self.scope_name)
 			self.internal_initial_state, self.internal_default_state, self.internal_final_state = internal_state_tuple 
 			print( "	[{}]RNN layer output shape: {}".format(self.id, input.get_shape()) )
-			for i,h in enumerate(self.internal_initial_state):
-				print( "	[{}]RNN{} initial state shape: {}".format(self.id, i, h.get_shape()) )
-			for i,h in enumerate(self.internal_final_state):
-				print( "	[{}]RNN{} final state shape: {}".format(self.id, i, h.get_shape()) )
 		# [Policy]
 		self.policy_batch = self._policy_layer(input=input, scope=self.scope_name) if has_actor else None
 		# print( "	[{}]Policy shape: {}".format(self.id, self.policy_batch.get_shape()) )

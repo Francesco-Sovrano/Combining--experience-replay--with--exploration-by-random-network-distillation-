@@ -18,10 +18,10 @@ fi
 # install tensorflow with support for: FMA, AVX, AVX2, SSE4.1, SSE4.2
 pip install pip==9.0.3 # pip 10.0.1 has issues with pybind11 -> required by fastText
 # install common libraries
-pip install cython psutil numba
+pip install psutil
 pip install tensorflow==1.13.1 # tensorflow includes numpy
 pip install scipy sklearn
 pip install matplotlib seaborn imageio
-pip install sortedcontainers opencv-python
+pip install sortedcontainers
 # install gym
 pip install gym[atari]
