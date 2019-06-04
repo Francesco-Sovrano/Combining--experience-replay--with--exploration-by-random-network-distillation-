@@ -32,6 +32,19 @@ Experiments
 Here, the results of some of our experiments in the form of a comparison of our algorithm (PPO/RND/POER) against PPO/RND and PPO/POER. For deeper details about the performed experiments and the evaluation of their results, please read [Combining Experience Replay with Exploration by Random Network Distillation](https://arxiv.org/abs/1905.07579).
 ![PPO/RND/POER vs PPO/RND vs PPO/POER in: Montezuma's Revenge, Solaris, Venture](images/all.png)
 
+Citation
+-------
+
+Please use the following bibtex entry:
+```
+@article{sovrano2019combining,
+  title={Combining Experience Replay with Exploration by Random Network Distillation},
+  author={Sovrano, Francesco},
+  journal={arXiv preprint arXiv:1905.07579},
+  year={2019}
+}
+```
+
 Contact
 -------
 
